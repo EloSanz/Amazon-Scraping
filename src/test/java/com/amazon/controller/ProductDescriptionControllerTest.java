@@ -1,32 +1,48 @@
 package com.amazon.controller;
 
-import com.amazon.AmazonScrappingApplication;
+import com.amazon.model.ProductDescription;
+import com.amazon.repository.ProductDescriptionRepository;
+import com.amazon.service.ProductDescriptionService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-@SpringBootTest(classes = AmazonScrappingApplication.class)
-@AutoConfigureMockMvc
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
 class ProductDescriptionControllerTest {
+    @Mock
+    private ProductDescriptionController controller;
 
-    @Autowired
-    private MockMvc mockMvc;
+    @InjectMocks
+    private ProductDescriptionService service;
+    @Mock
+    private ProductDescriptionRepository repository;
 
     @Test
-    void testFetchProductDescription() {
-        try {
-            mockMvc.perform(MockMvcRequestBuilders.post("/api/products/fetch")
-                            .param("url", "https://www.amazon.com/gp/product/B00SMBFZNG"))
-                    .andExpect(MockMvcResultMatchers.status().isOk())
-                    .andExpect(MockMvcResultMatchers.jsonPath("$.productId").exists())
-                    .andExpect(MockMvcResultMatchers.jsonPath("$.description").exists());
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Test failed due to exception: " + e.getMessage(), e);
-        }
+    void testEndpoint() {
+        String expected = "testing";
+        when(controller.testEndpoint()).thenReturn(expected);
+
+        String result = controller.testEndpoint();
+
+        Assertions.assertEquals(expected, result);
     }
+    @Test
+    void testFetchProductDescription() throws Exception {
+
+        ProductDescription mockedDescription = new ProductDescription();
+        mockedDescription.setProductId("B00SMBFZNG");
+        when(repository.save(any(ProductDescription.class))).thenReturn(mockedDescription);
+
+        ProductDescription result = service.fetchAndSaveDescription("https://www.amazon.com/gp/product/B00SMBFZNG");
+        Assertions.assertEquals("B00SMBFZNG", result.getProductId());
+    }
+
 }

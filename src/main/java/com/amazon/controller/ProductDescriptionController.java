@@ -21,17 +21,15 @@ public class ProductDescriptionController {
         return service.fetchAndSaveDescription(url);
     }
 
-    /*
     @GetMapping("/test")
     public String testEndpoint() {
-        return "testing ! ! ";
+        return "testing";
     }
-    */
+
     @GetMapping("/{productId}/word-frequency")
     public Map<String, Integer> getWordFrequency(@PathVariable String productId) {
         return service.getWordFrequency(productId);
     }
-
     @GetMapping
     public List<ProductDescription> getAllProductDescriptions() {
         return service.getAllProductDescriptions();

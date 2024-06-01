@@ -34,7 +34,7 @@ public class ProductDescriptionService {
 
         return repository.save(productDescription);
     }
-    String removeProductDescriptionHeader(String description) {
+    public String removeProductDescriptionHeader(String description) {
         int startIndex = description.indexOf("Product Description");
         if (startIndex != -1) {
             // Si se encuentro el encabezado lo saco, junto a los espacios en blanco

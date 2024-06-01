@@ -12,13 +12,12 @@ class ProductDescriptionServiceTest {
     @InjectMocks
     private ProductDescriptionService service;
 
-    @Test
-    void removeProductDescriptionHeader() {
+    @Test//working
+    void testRemoveProductDescriptionHeader() {
         String description = "Product Description Sleek oCOSMO CE4031 brush pattern black 40\" 1080P LED MHL & Roku Ready HDTV features...";
         String expected = "Sleek oCOSMO CE4031 brush pattern black 40\" 1080P LED MHL & Roku Ready HDTV features...";
 
         String result = service.removeProductDescriptionHeader(description);
-
         Assertions.assertEquals(expected, result, "The header should be removed from the product description");
     }
 
