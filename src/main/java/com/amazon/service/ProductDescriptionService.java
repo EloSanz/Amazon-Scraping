@@ -32,6 +32,9 @@ public class ProductDescriptionService {
         productDescription.setProductId(productId);
         productDescription.setDescription(description);
 
+        if(description.isEmpty())
+            return  null;//I'll not save empty descriptions
+
         return repository.save(productDescription);
     }
     public String removeProductDescriptionHeader(String description) {
@@ -44,18 +47,16 @@ public class ProductDescriptionService {
             return description;
         }
     }
-    private String extractProductId(String productUrl) {
+    public String extractProductId(String productUrl) {
         // Example: https://www.amazon.com/gp/product/B00SMBFZNG -> B00SMBFZNG
         return productUrl.substring(productUrl.lastIndexOf('/') + 1);
     }
     public Map<String, Integer> getWordFrequency(String productId) {
         // This productId is Unique, so I'll use findByProductId from my repository.
         ProductDescription productDescription = repository.findByProductId(productId);
-
         if (productDescription == null) {
             return new HashMap<>();
         }
-
         // Set of words to filter out
         Set<String> filteredWords = new HashSet<>(Arrays.asList("the", "to", "you", "yours", "a", "an","and", "as",
                 "it", "in", "with", "that", "its", "of", "are", "all", "is", "for", "where", "more"));
@@ -69,7 +70,6 @@ public class ProductDescriptionService {
                 wordCount.put(word, wordCount.getOrDefault(word, 0) + 1);
             }
         }
-
         // Convert map to list of entries
         List<Map.Entry<String, Integer>> entryList = new ArrayList<>(wordCount.entrySet());
 
