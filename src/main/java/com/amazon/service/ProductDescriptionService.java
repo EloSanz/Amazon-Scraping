@@ -1,6 +1,9 @@
 package com.amazon.service;
 
+import com.amazon.model.ErrorLog;
 import com.amazon.model.ProductDescription;
+import com.amazon.repository.ErrorLogRepository;
+import lombok.Setter;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,16 +18,19 @@ import java.util.*;
 @Service
 public class ProductDescriptionService {
 
+    @Setter
     @Autowired
     private ProductDescriptionRepository repository;
 
-    public ProductDescription fetchAndSaveDescription(String productUrl){
+    @Autowired
+    private ErrorLogRepository errorLogRepository;
+
+    public String fetchAndSaveDescription(String productUrl){
         // Simulate a browser to fix the null div problem
         Connection connection = Jsoup.connect(productUrl)
-                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
-                .header("Accept-Language", "en-US,en;q=0.9")
-                .header("Accept-Encoding", "gzip, deflate, br")
-                .header("Referer", "https://www.google.com");
+                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.64")
+                .header("Connection", "keep-alive");
+
 
         Document doc;
         try {
@@ -35,19 +41,30 @@ public class ProductDescriptionService {
         }
         String productId = extractProductId(productUrl);
         String description = doc.select("#productDescription").text();
+        //System.out.println(description);
+
+
 
         if (description.isEmpty()) {
-            System.out.println("Product with description empty: " + productUrl);
-            throw new ProductDescriptionNotFoundException("Failed to save product description for URL: " + productUrl);// Don't save empty descriptions
+            System.out.println("\tProduct with description empty: " + productUrl);
+            String errorMessage = "Failed to save product description for URL: " + productUrl;
+
+            if(errorLogRepository.findByUrl(productUrl) == null)
+                errorLogRepository.save(new ErrorLog(productUrl, errorMessage));
+
+            throw new ProductDescriptionNotFoundException(errorMessage);// Don't save empty descriptions
             }
-        // Eliminar el encabezado "Product Description"
+        // Delete header "Product Description", entorpece la nube de palabras
         description = removeProductDescriptionHeader(description);
 
         ProductDescription productDescription = new ProductDescription();
         productDescription.setProductId(productId);
         productDescription.setDescription(description);
 
-        return repository.save(productDescription);
+        repository.save(productDescription);
+        System.out.println( "\t["+ productId + "]" + "posted");
+        return "\t"+ productId;
+
     }
     public String removeProductDescriptionHeader(String description) {
         int startIndex = description.indexOf("Product Description");
@@ -113,4 +130,5 @@ public class ProductDescriptionService {
     public List<ProductDescription> getAllProductDescriptions() {
         return repository.findAll();
     }
+
 }

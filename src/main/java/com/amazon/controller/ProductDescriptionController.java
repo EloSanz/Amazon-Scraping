@@ -24,12 +24,12 @@ public class ProductDescriptionController {
     @Autowired
     private ProductDescriptionRepository repository;
     @PostMapping("/fetch")
-    public ProductDescription fetchProductDescription(@RequestParam String url) {
+    public String fetchProductDescription(@RequestParam String url) {
         String productId = service.extractProductId(url);
         ProductDescription productDescription = repository.findByProductId(productId);
 
         if (productDescription != null) {
-            return productDescription;
+            return  "\t[" + productId +"]"+ " Already posted";
         } else {
             try {
                 return service.fetchAndSaveDescription(url);
@@ -58,7 +58,8 @@ public class ProductDescriptionController {
             if (productDescription != null)
                 return service.getWordFrequency(productId);
             else {
-                ProductDescription fetchedDescription = fetchProductDescription("https://www.amazon.com/gp/product/" + productId);
+                fetchProductDescription("https://www.amazon.com/gp/product/" + productId);
+                ProductDescription fetchedDescription = repository.findByProductId(productId);
                 if (fetchedDescription == null)
                     throw new ProductDescriptionNotFoundException("Product description not found for ID: " + productId);
                 else
