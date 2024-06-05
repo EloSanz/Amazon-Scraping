@@ -92,8 +92,22 @@
 			<version>42.2.12</version>
 		</dependency>
 
-	</dependencies>
 
+
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>4.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-chrome-driver</artifactId>
+			<version>4.0.0</version>
+		</dependency>
+
+
+	</dependencies>
 
 	<build>
 		<plugins>
@@ -107,6 +121,11 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.0.0</version>
+
+				<configuration>
+					<argLine>-XX:+IgnoreUnrecognizedVMOptions --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+				</configuration>
+
 			</plugin>
 
 

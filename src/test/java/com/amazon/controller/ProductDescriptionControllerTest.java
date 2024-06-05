@@ -48,7 +48,7 @@ class ProductDescriptionControllerTest {
 
         when(service.fetchAndSaveDescription(any(String.class))).thenReturn(mockedDescription);
 
-        ProductDescription result = controller.fetchProductDescription(url);
+        ProductDescription result = (ProductDescription) controller.fetchProductDescription(url);
 
         Assertions.assertEquals(expectedProductId, result.getProductId());
     }
